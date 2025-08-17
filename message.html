@@ -1,0 +1,182 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hommage à Leslie</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: linear-gradient(45deg, #ff4d4d, #ff99cc);
+            font-family: 'Georgia', serif;
+            color: #fff;
+            position: relative;
+        }
+
+        /* Fond avec effet de vagues */
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.76,104.76C1514,34.58,1200,120Z" fill="rgba(255,255,255,0.5)"/></svg>');
+            background-size: cover;
+            animation: wave 20s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-1200px); }
+        }
+
+        .container {
+            text-align: center;
+            z-index: 1;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            text-shadow: 0 0 10px rgba(255, 99, 147, 0.8);
+            animation: glow 2s ease-in-out infinite alternate;
+            color: #fff;
+        }
+
+        p {
+            font-size: 1.8em;
+            line-height: 1.5;
+            opacity: 0;
+            animation: textFadeIn 4s ease-in forwards;
+            animation-delay: 1s;
+            color: #fff;
+        }
+
+        /* Animation de lueur */
+        @keyframes glow {
+            0% { text-shadow: 0 0 10px rgba(255, 99, 147, 0.8); }
+            100% { text-shadow: 0 0 20px rgba(255, 99, 147, 1); }
+        }
+
+        @keyframes textFadeIn {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Particules en forme de cœurs */
+        .heart {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #ff4d4d;
+            transform: rotate(45deg);
+            animation: sparkle 5s infinite;
+            z-index: 0;
+        }
+
+        .heart::before,
+        .heart::after {
+            content: '';
+ hedges;
+            width: 12px;
+            height: 12px;
+            background: #ff4d4d;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .heart::before {
+            top: -6px;
+            left: 0;
+        }
+
+        .heart::after {
+            left: 6px;
+            top: 0;
+        }
+
+        .heart:nth-child(odd)::before,
+        .heart:nth-child(odd)::after {
+            background: #ff99cc;
+        }
+
+        @keyframes sparkle {
+            0% { transform: translateY(0) rotate(45deg) scale(1); opacity: 0.8; }
+            50% { transform: translateY(-50vh) rotate(45deg) scale(1.5); opacity: 0.2; }
+            100% { transform: translateY(-100vh) rotate(45deg) scale(0); opacity: 0; }
+        }
+
+        .heart:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .heart:nth-child(2) { left: 20%; animation-delay: 0.5s; }
+        .heart:nth-child(3) { left: 30%; animation-delay: 1s; }
+        .heart:nth-child(4) { left: 40%; animation-delay: 1.5s; }
+        .heart:nth-child(5) { left: 50%; animation-delay: 2s; }
+        .heart:nth-child(6) { left: 60%; animation-delay: 2.5s; }
+        .heart:nth-child(7) { left: 70%; animation-delay: 3s; }
+        .heart:nth-child(8) { left: 80%; animation-delay: 3.5s; }
+        .heart:nth-child(9) { left: 90%; animation-delay: 4s; }
+    </style>
+</head>
+<body>
+    <div class="wave"></div>
+    <div class="container">
+        <h1>Leslie, une étoile parmi nous</h1>
+        <p>Leslie, tu es une source d'inspiration infinie. Ton rire est une mélodie qui réchauffe les cœurs, ta bienveillance est un phare dans la nuit, et ton courage est une force qui nous pousse tous à être meilleurs. Tu es plus qu'une amie, plus qu'une présence : tu es un trésor rare, une âme qui rend le monde plus beau. À nos yeux, tu es irremplaçable, et cet hommage n'est qu'une petite étincelle face à la lumière que tu apportes.</p>
+    </div>
+    <div class="heart"></div>
+    <div class="heart"></div>
+    <div class="heart"></div>
+    <div class="heart"></div>
+    <div class="heart"></div>
+    <div class="heart"></div>
+    <div class="heart"></div>
+    <div class="heart"></div>
+    <div class="heart"></div>
+</body>
+</html>
